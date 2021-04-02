@@ -116,7 +116,7 @@ main() {
   # Pull the repository and run the playbook.
   REPO='https://github.com/ret2src/dotfiles'
   print_info "Pulling $REPO ..."
-  echo ansible-pull --ask-become-pass -e "desired_config=$DESIRED_CONFIG" "$REPO"
+  ansible-pull --ask-become-pass -e "desired_config=$DESIRED_CONFIG" "$REPO"
 }
 
 main "$@"
