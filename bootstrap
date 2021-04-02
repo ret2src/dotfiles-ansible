@@ -1,0 +1,122 @@
+#!/usr/bin/env sh
+#
+# ┌────────────────────────────────────────────────────────────────────────┐
+# │░░░█▀█░█▀█░█▀▀░▀█▀░█▀▄░█░░░█▀▀░░░█▀▄░█▀█░█▀█░▀█▀░█▀▀░▀█▀░█▀▄░█▀█░█▀█░░░░│
+# │░░░█▀█░█░█░▀▀█░░█░░█▀▄░█░░░█▀▀░░░█▀▄░█░█░█░█░░█░░▀▀█░░█░░█▀▄░█▀█░█▀▀░░░░│
+# │░░░▀░▀░▀░▀░▀▀▀░▀▀▀░▀▀░░▀▀▀░▀▀▀░░░▀▀░░▀▀▀░▀▀▀░░▀░░▀▀▀░░▀░░▀░▀░▀░▀░▀░░░░░░│
+# └────────────────────────────────────────────────────────────────────────┘
+#
+# This script installs Ansible and leverages it to configure all the things.
+#
+# Supported distributions:
+# - Ubuntu 20.04
+#
+# Usage:
+#   via curl:
+#     $ sh -c "$(curl -fsSL https://raw.githubusercontent.com/ret2src/dotfiles/main/bootstrap)"
+#   via wget:
+#     $ sh -c "$(wget -qO- https://raw.githubusercontent.com/ret2src/dotfiles/main/bootstrap)"
+#
+
+command_exists() {
+  command -v "$@" >/dev/null 2>&1
+}
+
+distribution_is() {
+  grep -Fq "$@" /etc/*-release
+}
+
+print_banner() {
+  echo '┌────────────────────────────────────────────────────────────────────────┐
+│░░░█▀█░█▀█░█▀▀░▀█▀░█▀▄░█░░░█▀▀░░░█▀▄░█▀█░█▀█░▀█▀░█▀▀░▀█▀░█▀▄░█▀█░█▀█░░░░│
+│░░░█▀█░█░█░▀▀█░░█░░█▀▄░█░░░█▀▀░░░█▀▄░█░█░█░█░░█░░▀▀█░░█░░█▀▄░█▀█░█▀▀░░░░│
+│░░░▀░▀░▀░▀░▀▀▀░▀▀▀░▀▀░░▀▀▀░▀▀▀░░░▀▀░░▀▀▀░▀▀▀░░▀░░▀▀▀░░▀░░▀░▀░▀░▀░▀░░░░░░│
+└────────────────────────────────────────────────────────────────────────┘
+                                                        by ret2src, 0x07E5
+  '
+}
+
+print_info() {
+  printf '%s[*]%s %s\n' "$BOLD$BLUE" "$RESET" "$*"
+}
+
+print_success() {
+  printf '%s[+]%s %s\n' "$BOLD$GREEN" "$RESET" "$*"
+}
+
+print_warn() {
+  printf '%s[!]%s %s\n' "$BOLD$YELLOW" "$RESET" "$*"
+}
+
+print_error() {
+  printf '%s[-] ERROR: %s %s\n' "$BOLD$RED" "$*" "$RESET"
+}
+
+print_question() {
+  printf '%s[?]%s %s\n' "$BOLD$MAGENTA" "$RESET" "$*"
+}
+
+setup_colors() {
+  # Only use colors if connected to a terminal.
+  if [ -t 1 ]; then
+    RED=$(printf '\033[31m')
+    GREEN=$(printf '\033[32m')
+    YELLOW=$(printf '\033[33m')
+    BLUE=$(printf '\033[34m')
+    MAGENTA=$(printf '\033[35m')
+    BOLD=$(printf '\033[1m')
+    RESET=$(printf '\033[m')
+  else
+    RED=""
+    GREEN=""
+    YELLOW=""
+    BLUE=""
+    MAGENTA=""
+    BOLD=""
+    RESET=""
+  fi
+}
+
+main() {
+  setup_colors
+
+  print_banner
+
+  # Install Ansible if it isn't already.
+  if ! command_exists ansible; then
+    print_info "Ansible does not seem to be installed yet."
+    if distribution_is Ubuntu; then
+      print_info "Detected distribution: Ubuntu"
+      print_info "Installing Ansible ..."
+      if sudo apt-get install -y ansible > /dev/null; then
+        print_success "Successfully installed Ansible!"
+      else
+        print_error "Ansible could not be installed. Aborting."
+	exit 1
+      fi
+    else
+      print_error "Your distribution is not supported."
+    fi
+  else
+    print_warn "Ansible is already installed. Skipping installation."
+  fi
+
+  # Ask user what configuration to use.
+  while true; do
+    print_question "Please select the desired configuration:"
+    echo '    [0] laptop'
+    echo -n '    > '
+    read SELECTION
+    case $SELECTION in
+      0 ) DESIRED_CONFIG="laptop"; break;;
+      * ) print_error "Not a valid selection.";;
+    esac
+  done
+
+  # Pull the repository and run the playbook.
+  REPO='https://github.com/ret2src/dotfiles'
+  print_info "Pulling $REPO ..."
+  echo ansible-pull --ask-become-pass -e "desired_config=$DESIRED_CONFIG" "$REPO"
+}
+
+main "$@"
