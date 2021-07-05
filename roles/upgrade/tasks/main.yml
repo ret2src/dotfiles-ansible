@@ -11,8 +11,12 @@
   become: yes
 
 - name: Check if a reboot is needed
+  stat:
+    path: /var/run/reboot-required
+    get_checksum: no
+    get_attributes: no
+    get_mime: no
   register: reboot_required_file
-  stat: path=/var/run/reboot-required get_md5=no
   when: ansible_facts['distribution'] == "Ubuntu"
 
 - name: Reboot the system if necessary
