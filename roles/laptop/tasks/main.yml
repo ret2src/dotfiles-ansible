@@ -1,3 +1,0 @@
-- name: Say hello
-  debug:
-    msg: hello

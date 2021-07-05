@@ -1,0 +1,16 @@
+- name: Add neovim stable repository from PPA
+  apt_repository:
+    repo: ppa:neovim-ppa/stable
+  when: ansible_facts['distribution'] == "Ubuntu"
+
+- name: Install neovim
+  apt:
+    name: "neovim"
+    state: present
+  when: ansible_facts['distribution'] == "Ubuntu"
+
+- name: Symlink neovim configuration
+  file:
+    src: "{{ ansible_env.PWD }}/roles/nvim/files/init.vim"
+    dest: "~/.config/nvim/init.vim"
+    state: link

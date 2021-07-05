@@ -4,6 +4,5 @@
   connection: local
   become: true
   roles:
-  - role: laptop
-    when: desired_config in ["laptop"]
-
+  - upgrade
+  - nvim
