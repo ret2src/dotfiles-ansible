@@ -7,9 +7,14 @@
 - name: Install neovim
   apt:
     name: "neovim"
-    state: present
+    state: latest
   when: ansible_facts['distribution'] == "Ubuntu"
   become: yes
+
+- name: Make sure neovim configuration directory exists
+  file:
+    path: "~/.config/nvim"
+    state: directory
 
 - name: Symlink neovim configuration
   file:
