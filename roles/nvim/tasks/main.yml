@@ -11,6 +11,13 @@
   when: ansible_facts['distribution'] == "Ubuntu"
   become: yes
 
+- name: Install curl for auto-installing plugins with vim-plug
+  apt:
+    name: "curl"
+    state: latest
+  when: ansible_facts['distribution'] == "Ubuntu"
+  become: yes
+
 - name: Make sure neovim configuration directory exists
   file:
     path: "~/.config/nvim"
