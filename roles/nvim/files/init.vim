@@ -24,8 +24,8 @@ Plug 'tpope/vim-commentary'
 " Lean & mean status/tabline for vim.
 Plug 'vim-airline/vim-airline'
 
-" HTML on steroids.
-Plug 'mattn/emmet-vim'
+" Accelerate writing HTML.
+Plug 'mattn/emmet-vim', { 'for': 'html' }
 
 " Initialize plugin system.
 call plug#end()
