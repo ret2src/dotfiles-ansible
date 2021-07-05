@@ -1,12 +1,6 @@
 #!/usr/bin/env sh
-#
-# ┌───────────────────────────────────────────────────────────────────────┐
-# │░░░█▀█░█▀█░█▀▀░▀█▀░█▀▄░█░░░█▀▀░░░█▀▄░█▀█░█▀█░▀█▀░█▀▀░▀█▀░█▀▄░█▀█░█▀█░░░│
-# │░░░█▀█░█░█░▀▀█░░█░░█▀▄░█░░░█▀▀░░░█▀▄░█░█░█░█░░█░░▀▀█░░█░░█▀▄░█▀█░█▀▀░░░│
-# │░░░▀░▀░▀░▀░▀▀▀░▀▀▀░▀▀░░▀▀▀░▀▀▀░░░▀▀░░▀▀▀░▀▀▀░░▀░░▀▀▀░░▀░░▀░▀░▀░▀░▀░░░░░│
-# └───────────────────────────────────────────────────────────────────────┘
-#
-# This script installs Ansible and leverages it to configure all the things.
+
+# Installs Ansible, runs playbook, configures all the things.
 #
 # Supported distributions:
 # - Ubuntu 20.04
@@ -25,16 +19,7 @@ command_exists() {
 }
 
 distribution_is() {
-  grep -Fq "$@" /etc/*-release
-}
-
-print_banner() {
-  printf '%s%s%s' "$GREEN" '┌─────────────────────────────────────────────────────────────────────────────┐
-│░░░░░█▀█░█▀█░█▀▀░▀█▀░█▀▄░█░░░█▀▀░░░░░█▀▄░█▀█░█▀█░▀█▀░█▀▀░▀█▀░█▀▄░█▀█░█▀█░░░░░│
-│░░░░░█▀█░█░█░▀▀█░░█░░█▀▄░█░░░█▀▀░░░░░█▀▄░█░█░█░█░░█░░▀▀█░░█░░█▀▄░█▀█░█▀▀░░░░░│
-│░░░░░▀░▀░▀░▀░▀▀▀░▀▀▀░▀▀░░▀▀▀░▀▀▀░░░░░▀▀░░▀▀▀░▀▀▀░░▀░░▀▀▀░░▀░░▀░▀░▀░▀░▀░░░░░░░│
-└─────────────────────────────────────────────────────────────────────────────┘' "$RESET"
-printf "\n$GREEN\033[7m 00000000   62 79 20 72 65 74 32 73 72 63 2C 20 32 30 32 31   by ret2src, 2021 \033[m$RESET\n\n"
+  grep -Fiq "$@" /etc/*-release
 }
 
 print_info() {
@@ -51,10 +36,6 @@ print_warn() {
 
 print_error() {
   printf '%s[-] ERROR: %s %s\n' "$BOLD$RED" "$*" "$RESET" >&2
-}
-
-print_question() {
-  printf '%s[?]%s %s\n' "$BOLD" "$RESET" "$*"
 }
 
 setup_colors() {
@@ -80,19 +61,18 @@ check_distro() {
   if distribution_is 'Ubuntu'; then
     print_info 'Detected distribution: Ubuntu'
   else
-    print_error 'Your distribution is not supported.'
+    print_error 'Your distribution is currently not supported.'
     exit 1
   fi
 }
 
 install_ansible() {
   if ! command_exists 'ansible'; then
-    print_info 'Ansible does not seem to be installed yet.'
     print_info 'Installing Ansible ...'
     if sudo apt-get install -y ansible > /dev/null; then
       print_success 'Successfully installed Ansible!'
     else
-      print_error 'Ansible could not be installed. Aborting.'
+      print_error 'Installation of Ansible failed. Aborting.'
       exit 1
     fi
   else
@@ -100,63 +80,24 @@ install_ansible() {
   fi
 }
 
-print_available_options() {
-  INDEX=0
-  while [ -n "$*" ]; do
-    printf '    [%s] %s\n' "$INDEX" "$1"
-    shift
-    INDEX=$((INDEX+1))
-  done
-  unset INDEX
-}
-
-set_desired_config() {
-  shift $(($1+1))
-  DESIRED_CONFIG="$1"
-  print_info "Selected configuration: $DESIRED_CONFIG"
-}
-
-prompt_configuration_selection() {
-  print_question "Please select the desired configuration:"
-  printf '\n'
-  print_available_options "$@"
-  printf '\n'
-
-  while true; do
-    printf '    > '
-    read -r SELECTION
-    if [ "$SELECTION" -ge 0 ] && [ "$SELECTION" -lt "$#" ]; then
-      set_desired_config "$SELECTION" "$@"
-      break
-    else
-      print_error "Not a valid selection."
-    fi
-  done
-  unset SELECTION
-}
-
 handover_to_ansible() {
-  REPO='https://github.com/ret2src/dotfiles'
-  print_info "Pulling $REPO ..."
-  ansible-pull --ask-become-pass -e "desired_config=$DESIRED_CONFIG" -U "$REPO"
-  unset REPO
+  URL='https://github.com/ret2src/dotfiles'
+  CHECKOUT='main'
+  print_info "Pulling $URL @ $CHECKOUT ..."
+  ansible-pull --ask-become-pass -C "$CHECKOUT" -U "$URL"
+  unset URL
+  unset CHECKOUT
 }
 
 main() {
   # Initialize support for colors and other formatting.
   setup_colors
 
-  # Print information about the script.
-  print_banner
-
   # Check if distribution is supported.
   check_distro
 
   # Install Ansible if it isn't already.
   install_ansible
-
-  # Ask user what configuration to use.
-  prompt_configuration_selection 'laptop'
 
   # Pull the repository and run the 'local.yml' playbook.
   handover_to_ansible
