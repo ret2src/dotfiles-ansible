@@ -80,6 +80,20 @@ install_ansible() {
   fi
 }
 
+install_git() {
+  if ! command_exists 'git'; then
+    print_info 'Installing Git ...'
+    if sudo apt-get install -y git > /dev/null; then
+      print_success 'Successfully installed Git!'
+    else
+      print_error 'Installation of Git failed. Aborting.'
+      exit 1
+    fi
+  else
+    print_warn 'Git is already installed. Skipping installation.'
+  fi
+}
+
 handover_to_ansible() {
   URL='https://github.com/ret2src/dotfiles'
   CHECKOUT='main'
@@ -98,6 +112,9 @@ main() {
 
   # Install Ansible if it isn't already.
   install_ansible
+
+  # Install Git if it isn't already. Required for 'ansible-pull' from GitHub.
+  install_git
 
   # Pull the repository and run the 'local.yml' playbook.
   handover_to_ansible
