@@ -2,12 +2,14 @@
   apt_repository:
     repo: ppa:neovim-ppa/stable
   when: ansible_facts['distribution'] == "Ubuntu"
+  become: yes
 
 - name: Install neovim
   apt:
     name: "neovim"
     state: present
   when: ansible_facts['distribution'] == "Ubuntu"
+  become: yes
 
 - name: Symlink neovim configuration
   file:
