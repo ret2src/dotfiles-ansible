@@ -21,11 +21,60 @@ Plug 'tpope/vim-sleuth'
 " Comment stuff out.
 Plug 'tpope/vim-commentary'
 
+" Insert or delete brackets, parens, quotes in pair.
+Plug 'jiangmiao/auto-pairs'
+
+" Wisely add "end" tags for different languages.
+Plug 'tpope/vim-endwise'
+
+" Quoting/parenthesizing made simple.
+Plug 'tpope/vim-surround'
+
+" Pairs of handy bracket mappings.
+Plug 'tpope/vim-unimpaired'
+
+" Enable repeating supported plugin maps with ".".
+Plug 'tpope/vim-repeat'
+
+" Use CTRL-A/CTRL-X to increment dates, times, and more.
+Plug 'tpope/vim-speeddating'
+
+"Vim motions on speed.
+Plug 'easymotion/vim-easymotion'
+
 " Lean & mean status/tabline for vim.
 Plug 'vim-airline/vim-airline'
 
-" Accelerate writing HTML.
-Plug 'mattn/emmet-vim', { 'for': 'html' }
+" Accelerate writing HTML and CSS.
+Plug 'mattn/emmet-vim', { 'for': ['html', 'css'] }
 
 " Initialize plugin system.
 call plug#end()
+
+" Configure 'vim-easymotion'.
+
+" Trigger the plugin with <Leader> instead of <Leader><Leader>.
+map <Leader> <Plug>(easymotion-prefix)
+
+" Use smartcase matching.
+let g:EasyMotion_smartcase = 1
+
+" Configure 'emmet-vim'.
+
+" Enable only for HTML and CSS.
+let g:user_emmet_install_global = 0
+autocmd FileType html,css EmmetInstall
+
+" Use spaces instead of tabs.
+let g:user_emmet_settings = {
+\  'html' : {
+\    'indentation' : '  '
+\  },
+\  'css' : {
+\    'indentation' : '  '
+\  }
+\}
+
+" Custom keybindings.
+
+let mapleader = "," " Map leader to comma.
