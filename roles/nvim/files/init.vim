@@ -15,6 +15,9 @@ call plug#begin('~/.vim/plugged')
 " A universal set of defaults that (hopefully) everyone can agree on.
 Plug 'tpope/vim-sensible'
 
+" Gruvbox color scheme.
+Plug 'morhetz/gruvbox'
+
 " Heuristically set buffer indentation options.
 Plug 'tpope/vim-sleuth'
 
@@ -51,6 +54,12 @@ Plug 'mattn/emmet-vim', { 'for': ['html', 'css'] }
 " Initialize plugin system.
 call plug#end()
 
+" Use gruvbox colorscheme.
+autocmd vimenter * ++nested colorscheme gruvbox
+
+" Fix colorscheme issues.
+set termguicolors
+
 " Configure 'vim-easymotion'.
 
 " Trigger the plugin with <Leader> instead of <Leader><Leader>.
@@ -74,6 +83,14 @@ let g:user_emmet_settings = {
 \    'indentation' : '  '
 \  }
 \}
+
+" Configure 'vim-airline'.
+
+" Show buffer numbers.
+let g:airline#extensions#tabline#buffer_nr_show = 1
+
+" Display buffers when there's only one tab open.
+let g:airline#extensions#tabline#enabled = 1
 
 " Custom keybindings.
 
