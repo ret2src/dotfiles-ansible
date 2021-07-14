@@ -1,0 +1,49 @@
+- name: Make sure the destination directory for kitty exists
+  file:
+    path: "/usr/local/applications"
+    state: directory
+  become: yes
+
+- name: Download kitty terminal emulator
+  shell:
+    cmd: "curl -L https://sw.kovidgoyal.net/kitty/installer.sh | sh /dev/stdin dest=/usr/local/applications launch=n"
+    warn: false
+  when: ansible_facts['distribution'] == "Ubuntu"
+  become: yes
+
+- name: Symlink kitty to /usr/local/bin
+  file:
+    src: "/usr/local/applications/kitty.app/bin/kitty"
+    dest: "/usr/local/bin/kitty"
+    state: link
+  when: ansible_facts['distribution'] == "Ubuntu"
+  become: yes
+
+- name: Integrate kitty into desktop environment
+  file:
+    src: "/usr/local/applications/kitty.app/share/applications/kitty.desktop"
+    dest: "/usr/local/share/applications/kitty.desktop"
+    state: link
+  when: ansible_facts['distribution'] == "Ubuntu"
+  become: yes
+
+- name: Symlink configuration files
+  file:
+    src: "{{ ansible_env.PWD }}/roles/kitty/files/{{ item.src }}"
+    dest: "~/.config/kitty/{{ item.dest }}"
+    state: link
+  with_items:
+    - {  src: "kitty.conf", dest: "kitty.conf" }
+    - { src: "gruvbox_dark.conf", dest: "gruvbox_dark.conf" }
+
+- name: Add kitty as a choice for the default terminal emulator
+  shell:
+    cmd: "update-alternatives --install /usr/bin/x-terminal-emulator x-terminal-emulator /usr/local/bin/kitty 50"
+  when: ansible_facts['distribution'] == "Ubuntu"
+  become: yes
+
+- name: Set kitty as the default terminal emulator
+  shell:
+    cmd: "update-alternatives --set x-terminal-emulator /usr/local/bin/kitty"
+  when: ansible_facts['distribution'] == "Ubuntu"
+  become: yes
