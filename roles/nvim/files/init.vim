@@ -101,3 +101,8 @@ map <Leader>k <Plug>(easymotion-k)
 " Custom keybindings.
 
 let mapleader = "," " Map leader to comma.
+
+" Custom options.
+
+" Do not automatically insert a leading comment character after pressing 'o' on a commented line.
+autocmd FileType * setlocal formatoptions-=o
