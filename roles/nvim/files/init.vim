@@ -42,7 +42,7 @@ Plug 'tpope/vim-repeat'
 " Use CTRL-A/CTRL-X to increment dates, times, and more.
 Plug 'tpope/vim-speeddating'
 
-"Vim motions on speed.
+" Vim motions on speed.
 Plug 'easymotion/vim-easymotion'
 
 " Lean & mean status/tabline for vim.
@@ -55,18 +55,10 @@ Plug 'mattn/emmet-vim', { 'for': ['html', 'css'] }
 call plug#end()
 
 " Use gruvbox colorscheme.
-autocmd vimenter * ++nested colorscheme gruvbox
+colorscheme gruvbox
 
 " Fix colorscheme issues.
 set termguicolors
-
-" Configure 'vim-easymotion'.
-
-" Trigger the plugin with <Leader> instead of <Leader><Leader>.
-map <Leader> <Plug>(easymotion-prefix)
-
-" Use smartcase matching.
-let g:EasyMotion_smartcase = 1
 
 " Configure 'emmet-vim'.
 
@@ -91,6 +83,20 @@ let g:airline#extensions#tabline#buffer_nr_show = 1
 
 " Display buffers when there's only one tab open.
 let g:airline#extensions#tabline#enabled = 1
+
+" Configure 'vim-easymotion'.
+let g:EasyMotion_do_mapping = 0 " Disable default mappings
+
+" Jump to anywhere you want with minimal keystrokes, with just one key binding.
+" `s{char}{label}`
+nmap s <Plug>(easymotion-overwin-f)
+
+" Turn on case-insensitive feature
+let g:EasyMotion_smartcase = 1
+
+" JK motions: Line motions
+map <Leader>j <Plug>(easymotion-j)
+map <Leader>k <Plug>(easymotion-k)
 
 " Custom keybindings.
 
